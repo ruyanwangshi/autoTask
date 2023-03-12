@@ -1,8 +1,8 @@
-import * as path from 'node:path'
+import path from 'node:path'
 
-const cwd = process.cwd()
+export const cwd = process.cwd()
 
-export function resovePath() {
-  console.log('当前运行的路径为', cwd)
-  return path.resolve()
+export function resovePath(...paths: string[]) {
+  return path.resolve(cwd, ...paths);
 }
+
