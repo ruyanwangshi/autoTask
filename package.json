@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "./lib/index.js",
   "scripts": {
-    "watch": "tsc --watch --project tsconfig.json",
+    "watch": "npx tsc --watch --project tsconfig.json",
     "dev": "node ./lib/index.js"
   },
   "dependencies": {
@@ -12,7 +12,8 @@
     "@types/node": "^18.15.0",
     "@types/shelljs": "^0.8.11",
     "inquirer": "^9.1.4",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.8.5",
+    "typescript": "^4.9.5"
   },
   "bin": {
     "autoTask": "./bin/autoTask.js"

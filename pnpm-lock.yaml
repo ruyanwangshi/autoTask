@@ -6,6 +6,7 @@ specifiers:
   '@types/shelljs': ^0.8.11
   inquirer: ^9.1.4
   shelljs: ^0.8.5
+  typescript: ^4.9.5
 
 dependencies:
   '@types/inquirer': registry.npmmirror.com/@types/inquirer/9.0.3
@@ -13,6 +14,7 @@ dependencies:
   '@types/shelljs': registry.npmmirror.com/@types/shelljs/0.8.11
   inquirer: registry.npmmirror.com/inquirer/9.1.4
   shelljs: registry.npmmirror.com/shelljs/0.8.5
+  typescript: registry.npmmirror.com/typescript/4.9.5
 
 packages:
 
@@ -577,6 +579,14 @@ packages:
     name: type-fest
     version: 3.6.1
     engines: {node: '>=14.16'}
+    dev: false
+
+  registry.npmmirror.com/typescript/4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/typescript/-/typescript-4.9.5.tgz}
+    name: typescript
+    version: 4.9.5
+    engines: {node: '>=4.2.0'}
+    hasBin: true
     dev: false
 
   registry.npmmirror.com/util-deprecate/1.0.2:

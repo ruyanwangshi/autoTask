@@ -23,10 +23,17 @@ async function runInquirer(scripts: string[]) {
       })
     }
   }
+  console.log('打包路径为', builds)
 
-  runBuild()
+  const had = files.includes(outputDir)
+  console.log('是否存在打包后的路径', files, had)
+  
+  if (had) {
+    shell.rm('-r', outputDir)
+  }
+  shell.mkdir(outputDir)
 
-  console.log('可执行的打包命令', builds)
+
   const promptRes = await inquirer.prompt([
     {
       type: 'checkbox', // 多选框
@@ -46,7 +53,7 @@ async function runInquirer(scripts: string[]) {
         name: 'prod',
         cmd: item,
       }
-    } else if (item.includes('test')){
+    } else if (item.includes('test')) {
       return {
         name: 'test',
         cmd: item,
@@ -59,11 +66,12 @@ async function runInquirer(scripts: string[]) {
   } catch (e) {
     console.log('创建地址成功')
   }
-  shell.exec(`chcp 65001`);
+  shell.exec(`chcp 65001`)
   for (const item of build_map) {
     shell.exec(`pnpm ${item.cmd}`)
-    console.log(resovePath(fromFile,'./'), resovePath(item.name,'./'))
-    shell.mv(`${resovePath(fromFile)}/`, resovePath(outputDir,item.name))
+    console.log(resovePath(fromFile, './'), resovePath(item.name, './'))
+    shell.cp(resovePath(fromFile, './*'), resovePath(outputDir, item.name))
+    shell.mv(`${resovePath(fromFile,'./*')}/`, resovePath(outputDir, item.name))
   }
 }
 
@@ -88,42 +96,39 @@ function setConfigFile() {
   return true
 }
 
-function runBuild() {
-  const had = files.includes(outputDir)
-  if (had) {
-    shell.rm(outputDir)
+async function runBuild(packagePath: string) {
+  const res = await fs.readFile(packagePath, 'utf-8')
+  const packages = JSON.parse(res) as {
+    [key: string]: any
   }
-  shell.mkdir(outputDir)
-  return false
+  // 项目配置文件的运行脚本列表
+  const scripts = packages.scripts
+  runInquirer(scripts)
+
+  return true
 }
 
-async function runCommand(avgs: string[]) {
+async function runCommand(avgs: string[], packagePath: string) {
   let next = false
+  console.time('start')
   if (Array.isArray(avgs)) {
-    avgs.forEach((cmd) => {
-      const fn = cmd_map[cmd]
-      if (typeof fn === 'function') {
-        next = fn()
-        console.log('执行了', next)
-      }
-    })
+    const cmd = avgs[0]
+    const fn = cmd_map[cmd]
+    if (typeof fn === 'function') {
+      next = await fn(packagePath)
+      console.log('执行了', next)
+    }
+    return next
   }
-
+  console.timeEnd('start')
   return next
 }
+
 async function run(avgs: string[], packagePath: string) {
   console.log(avgs, packagePath)
-  if (await runCommand(avgs)) return
+  if (await runCommand(avgs, packagePath)) return
 
   try {
-    const res = await fs.readFile(packagePath, 'utf-8')
-    const packages = JSON.parse(res) as {
-      [key: string]: any
-    }
-    // 项目配置文件的运行脚本列表
-    const scripts = packages.scripts
-    console.log('对应可执行打包命令列表', scripts)
-    runInquirer(scripts)
     // 检查是否有自动化打包用具文件
   } catch (error) {
     console.log('请确认该项目配置文件正确！', error)
