@@ -9,6 +9,11 @@ const configFileName = 'autoTask.json'
 const outputDir = 'autoTask'
 const fromFile = 'dist'
 
+interface CmdMap {
+  name: string
+  cmd: string
+}
+
 async function runInquirer(scripts: string[]) {
   // const builds = scripts.filter(item => item.includes('build'))
   const builds: Array<{
@@ -27,12 +32,11 @@ async function runInquirer(scripts: string[]) {
 
   const had = files.includes(outputDir)
   console.log('是否存在打包后的路径', files, had)
-  
+
   if (had) {
     shell.rm('-r', outputDir)
   }
   shell.mkdir(outputDir)
-
 
   const promptRes = await inquirer.prompt([
     {
@@ -42,7 +46,7 @@ async function runInquirer(scripts: string[]) {
     },
   ])
 
-  const build_map = promptRes.build.map((item) => {
+  const build_map = (promptRes.build as string[]).map((item) => {
     if (item.includes('pre')) {
       return {
         name: 'pre',
@@ -53,25 +57,44 @@ async function runInquirer(scripts: string[]) {
         name: 'prod',
         cmd: item,
       }
-    } else if (item.includes('test')) {
+    } else {
       return {
         name: 'test',
         cmd: item,
       }
     }
-  })
+  }) as CmdMap[]
 
+  // 创建打包后的文件夹
+  createBuildDir(build_map)
+
+  // 这段代码是在Windows操作系统的命令提示符中执行
+  // chcp 65001
+  // 用于将命令的字符集编码设置为UTF-8,以便支持Unicode字符集。
+//   shell.exec(`chcp 65001`)
+
+  // 开始执行打包命令并移动文件夹
+  buildMv(build_map)
+}
+
+function createBuildDir(build_map: CmdMap[]) {
   try {
     shell.mkdir(...build_map.map((item) => resovePath(outputDir, item.name)))
   } catch (e) {
     console.log('创建地址成功')
   }
-  shell.exec(`chcp 65001`)
+}
+
+function buildMv(build_map: CmdMap[]) {
   for (const item of build_map) {
     shell.exec(`pnpm ${item.cmd}`)
     console.log(resovePath(fromFile, './'), resovePath(item.name, './'))
-    shell.cp(resovePath(fromFile, './*'), resovePath(outputDir, item.name))
-    shell.mv(`${resovePath(fromFile,'./*')}/`, resovePath(outputDir, item.name))
+
+    // 将 sourceDir 中的所有文件移动到 destDir
+    shell.mv('-n', resovePath(fromFile, './*'), resovePath(outputDir, item.name))
+    // -n选项表示不覆盖已存在的文件，如果你需要覆盖文件，可以将该选项删除。
+    // shell.cp(resovePath(fromFile, './*'), resovePath(outputDir, item.name))
+    // shell.mv(`${resovePath(fromFile,'./*')}/`, resovePath(outputDir, item.name))
   }
 }
 
@@ -109,6 +132,7 @@ async function runBuild(packagePath: string) {
 }
 
 async function runCommand(avgs: string[], packagePath: string) {
+  console.log('对应的环境列表', avgs)
   let next = false
   console.time('start')
   if (Array.isArray(avgs)) {
