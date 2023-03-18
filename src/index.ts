@@ -1,7 +1,8 @@
-import { runBuild, setConfig } from './command/index.js'
+import { runBuild, setConfig, pdfepub } from './command/index.js'
 
 const cmd_map = {
   '--i': setConfig,
+  '--p': pdfepub,
   '--b': runBuild,
   init: setConfig,
   build: runBuild,
