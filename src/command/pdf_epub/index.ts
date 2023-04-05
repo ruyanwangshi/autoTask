@@ -4,7 +4,7 @@ import epubGenerator from 'epub-gen'
 import inquirer from 'inquirer'
 import { getFileList, resovePath } from '../../utils/index.js'
 import { Stream } from 'node:stream'
-
+console.log('是否存在内容', epubGenerator)
 async function pdf_epub() {
   const regex = /\.pdf$/i
   const files = getFileList().filter((file) => regex.test(file))

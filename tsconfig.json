@@ -11,12 +11,13 @@
       "baseUrl": ".",
       "outDir": "./lib",
       "strict": true,
+      "declaration": true,
       "resolveJsonModule": true,
       "paths": {
         "@/*":["./src/*"]
       },
     },
-    "include": ["./src/*.ts","./src/*.d.ts"],
+    "include": ["./src/*.ts","./src/**/*.d.ts"],
     "exclude": ["./dist"]
   }
   
